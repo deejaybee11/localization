@@ -1,0 +1,3 @@
+scp src/*.cpp dbro184@login.uoa.nesi.org.nz:/projects/uoa00057/dbro184/localization/src/ 
+scp include/*.hpp dbro184@login.uoa.nesi.org.nz:/projects/uoa00057/dbro184/localization/include/
+scp makefile dbro184@login.uoa.nesi.org.nz:/projects/uoa00057/dbro184/localization/
