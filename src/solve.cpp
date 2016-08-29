@@ -102,7 +102,7 @@ void calculate_time_evolution(SimulationData &sim_data, WaveFunction &psi, Poten
 	pot_data.assign_momentum_time_evolution(sim_data, psi, true);
 
 	//Time to find the ground state!
-	for (int i = 0; i < sim_data.num_imaginary_steps; ++i) {
+	for (int i = 0; i < sim_data.num_real_steps; ++i) {
 		//calculate abs(psi)**2
 		psi.calc_abs_psi(sim_data.get_N());
 		psi.calculate_norm(sim_data);
@@ -111,7 +111,7 @@ void calculate_time_evolution(SimulationData &sim_data, WaveFunction &psi, Poten
 			char buf1[200];
 			char buf2[200];
 			strcpy(buf1, sim_data.folder);
-			sprintf(buf2, "/psi%d.fit\0", i/500);
+			sprintf(buf2, "/psi%d.fit\0", i/10000);
 			strcat(buf1, buf2);
 			int length = strlen(buf1);
 			char *full_filename;
