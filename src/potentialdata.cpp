@@ -160,6 +160,11 @@ void PotentialData::calculate_non_linear(SimulationData &sim_data, WaveFunction 
 
 }
 
+void smooth_edges_green(SimulationData &sim_data) {
+
+
+}
+
 
 PotentialData::~PotentialData() {
 	mkl_free(harmonic_trap);
