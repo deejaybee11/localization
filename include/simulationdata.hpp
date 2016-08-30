@@ -47,6 +47,7 @@ public:
 	struct tm *mytime;
 	char folder[80];
 	char command[80];
+	char date[12];
 	//Array pointers 
 	double *x;
 	double *y;
@@ -77,6 +78,7 @@ public:
 	//Iteration stuff
 	int num_real_steps;
 	int num_imaginary_steps;
+	int current_step;
 	const char *R = "REAL";
 	const char *I = "IMAG";
 	//Private setters and getters

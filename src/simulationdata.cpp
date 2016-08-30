@@ -46,6 +46,7 @@ SimulationData::SimulationData(int num_x, int num_y) {
 	system(this->command);
 	printf("Directory Created\n");
 	sprintf(this->folder, "fits/%.4d%.2d%.2d%.2d%.2d", 1900 + this->mytime->tm_year, 1 + this->mytime->tm_mon, this->mytime->tm_mday, this->mytime->tm_hour, this->mytime->tm_min);
+	sprintf(this->date, "%.4d%.2d%.2d%.2d%.2d", 1900 + this->mytime->tm_year, 1 + this->mytime->tm_mon, this->mytime->tm_mday, this->mytime->tm_hour, this->mytime->tm_min);
 	//Simulation Data
 	this->num_x = num_x;
 	this->num_y = num_y;
@@ -85,7 +86,7 @@ SimulationData::SimulationData(int num_x, int num_y) {
 	//Tine steps
 	this->dt = this->dx * 0.001;
 	this->num_imaginary_steps = 10000;
-	this->num_real_steps = 10000000;
+	this->num_real_steps = 1000000;
 	//Populate momentum arrays
 	double ax = -0.5 * this->num_x;
 	double bx = 0.5 * this->num_x - 1.0;

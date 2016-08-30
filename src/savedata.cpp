@@ -38,13 +38,22 @@ void save_fits_image_wavefunction(SimulationData &sim_data, WaveFunction &psi, c
 	//Absolute value of psi calculated
 	psi.calc_abs_psi(sim_data.get_N());
 	//Add psi values to savedata
+	#pragma omp parallel for
 	for (int i = 0; i < sim_data.get_N(); ++i) {
 		save_data[i] = psi.abs_psi[i];
 	}
+	int numx = sim_data.get_num_x();
+	int numy = sim_data.get_num_y();
+	int step = sim_data.current_step;
+	char *date = sim_data.date;
 	//Create fits file
 	fits_create_file(&fptr, fits_file_name, &status);
 	fits_create_img(fptr, DOUBLE_IMG, naxis, naxes, &status);
 	nelements = naxes[0] * naxes[1];
+	fits_update_key(fptr, TINT, "NUMX", &numx, "Number of points in x", &status);
+	fits_update_key(fptr, TINT, "NUMY", &numy, "Number of points in y", &status);
+	fits_update_key(fptr, TINT, "TSTEP", &step, "Current time step.", &status);
+	fits_update_key(fptr, TSTRING, "DATE", &date, "Date", &status);
 	fits_write_img(fptr, TDOUBLE, fpixel, nelements, save_data, &status);
 	fits_close_file(fptr, &status);
 	fits_report_error(stderr, status);
@@ -63,6 +72,7 @@ void save_fits_image_potential(SimulationData &sim_data, double *potential, cons
 	long fpixel = 1, naxis = 2, nelements;
 	long naxes[2] = {sim_data.get_num_y(), sim_data.get_num_x()};
 	//add values to save_data
+	#pragma omp parallel for
 	for (int i = 0; i < sim_data.get_N(); ++i) {
 		save_data[i] = potential[i];
 	}

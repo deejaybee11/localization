@@ -47,6 +47,7 @@ WaveFunction::WaveFunction(SimulationData &sim_data, double *harmonic_trap) {
 	this->abs_psi = (double*)mkl_malloc(sim_data.get_N() * sizeof(double), 64);
 	int index;
 	for (int i = 0; i < sim_data.get_num_x(); ++i) {
+		#pragma omp parallel for private(index)
 		for (int j = 0; j < sim_data.get_num_y(); ++j) {
 			index = i * sim_data.get_num_y() + j;	
 			if (sqrt(pow(sim_data.x[i], 2.0) + pow(sim_data.y[j], 2.0)) <= 3) {
@@ -66,8 +67,12 @@ WaveFunction::WaveFunction(SimulationData &sim_data, double *harmonic_trap) {
 
 void WaveFunction::calc_abs_psi(int n) {
 	//calculates abs|psi|**2
-	vzAbs(n, this->psi, this->abs_psi);
-	vdMul(n, this->abs_psi, this->abs_psi, this->abs_psi);
+//	vzAbs(n, this->psi, this->abs_psi);
+//	vdMul(n, this->abs_psi, this->abs_psi, this->abs_psi);
+	#pragma omp parallel for
+	for (int i = 0; i < n; ++i) {
+		this->abs_psi[i] = psi[i].real * psi[i].real + psi[i].imag * psi[i].imag;
+	}
 }
 
 void WaveFunction::calculate_norm(SimulationData &sim_data) {
@@ -78,12 +83,14 @@ void WaveFunction::calculate_norm(SimulationData &sim_data) {
 	double norm_factor = 0;
 	
 	//Sum abs_psi
+	#pragma omp parallel for reduction(+:psi_sum)
 	for (int i = 0; i < sim_data.get_N(); ++i) {
 		psi_sum += this->abs_psi[i];
 	}
 	//1/(integral of psi)
 	norm_factor = sqrt(1.0 / (psi_sum * sim_data.dx * sim_data.dy));
 	//Scale Psi by the integral
+	#pragma omp parallel for private(temp_real, temp_imag)
 	for (int i = 0; i < sim_data.get_N(); ++i) {
 		temp_real = this->psi[i].real * norm_factor;
 		temp_imag = this->psi[i].imag * norm_factor;

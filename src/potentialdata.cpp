@@ -61,8 +61,7 @@ PotentialData::PotentialData(SimulationData &sim_data) {
 			this->kinetic_energy[index] = k_en_val;
 		}
 	}
-	
-	
+	std::cout << this->harmonic_trap[120] << std::endl;
 };
 
 void PotentialData::calculate_green(SimulationData &sim_data) {
@@ -82,7 +81,7 @@ void PotentialData::calculate_green(SimulationData &sim_data) {
 
 
 	for (int i = 0; i < sim_data.get_N(); ++i) {
-		this->green_potential[i] = 1;
+		this->green_potential[i] = 5000;
 	}
 
 	int index;

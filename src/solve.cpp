@@ -56,7 +56,6 @@ void calculate_ground_state(SimulationData &sim_data, WaveFunction &psi, Potenti
 	status = DftiCommitDescriptor(handle);
 
 	pot_data.assign_momentum_time_evolution(sim_data, psi, false);
-
 	//Time to find the ground state!
 	for (int i = 0; i < sim_data.num_imaginary_steps; ++i) {
 		if (i%100 == 0) {
@@ -77,7 +76,7 @@ void calculate_ground_state(SimulationData &sim_data, WaveFunction &psi, Potenti
 		vzMul(sim_data.get_N(), psi.psi, pot_data.mom_time_evolution, psi.psi);
 		//Transform back then multiply by other half of position operator
 		status = DftiComputeBackward(handle, psi.psi, psi.psi);
-	     	vzMul(sim_data.get_N(), psi.psi, pot_data.pos_time_evolution, psi.psi);
+	    	vzMul(sim_data.get_N(), psi.psi, pot_data.pos_time_evolution, psi.psi);
 	}
 	DftiFreeDescriptor(&handle);
 	save_fits_image_wavefunction(sim_data, psi, "GroundState.fit");
@@ -100,13 +99,12 @@ void calculate_time_evolution(SimulationData &sim_data, WaveFunction &psi, Poten
 	status = DftiCommitDescriptor(handle);
 
 	pot_data.assign_momentum_time_evolution(sim_data, psi, true);
-
 	//Time to find the ground state!
 	for (int i = 0; i < sim_data.num_real_steps; ++i) {
 		//calculate abs(psi)**2
 		psi.calc_abs_psi(sim_data.get_N());
-		psi.calculate_norm(sim_data);
 		if (i%10000 == 0) {
+			sim_data.current_step = i;
 			std::cout << "Real step " << i << " of " << sim_data.num_real_steps << std::endl;
 			char buf1[200];
 			char buf2[200];
@@ -123,7 +121,7 @@ void calculate_time_evolution(SimulationData &sim_data, WaveFunction &psi, Poten
 		//Calculate nonlinear energy term
 		pot_data.calculate_non_linear(sim_data, psi);
 		//Assign the position time evolution operator values
-		pot_data.assign_position_time_evolution(sim_data, psi, false, false, true);
+		pot_data.assign_position_time_evolution(sim_data, psi, false, true, true);
 		//multiply by position operator with t/2
 		vzMul(sim_data.get_N(), psi.psi, pot_data.pos_time_evolution, psi.psi);
 		//Perform forward transform and multiply by evolution operator	
@@ -136,3 +134,6 @@ void calculate_time_evolution(SimulationData &sim_data, WaveFunction &psi, Poten
 	DftiFreeDescriptor(&handle);
 	save_fits_image_wavefunction(sim_data, psi, "FinalState.fit");
 }
+
+
+

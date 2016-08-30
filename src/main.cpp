@@ -45,7 +45,7 @@ int main() {
 	system("echo KMP_BLOCKTIME = $KMP_BLOCKTIME");
 	system("echo KMP_AFFINITY = $KMP_AFFINITY");
 	mkl_set_num_threads(mkl_get_max_threads());
-	mkl_disable_fast_mm();
+//	mkl_disable_fast_mm();
 
 	//Initiate classes
 	SimulationData sim_data(1024, 1024);
