@@ -162,7 +162,7 @@ void PotentialData::calculate_non_linear(SimulationData &sim_data, WaveFunction 
 }
 
 void PotentialData::smooth_edges_green(SimulationData &sim_data, int num_iterations) {
-	double sigma = 1.0;
+	double sigma = 15.0;
 	double r, s = 2.0 * sigma * sigma;
 	double sum_kernel = 0.0;
 
@@ -171,35 +171,43 @@ void PotentialData::smooth_edges_green(SimulationData &sim_data, int num_iterati
 		system("rm SmoothedPotential.fit");
 		std::cout << "SmoothedPotential.fit deleted" << std::endl;
 	}	
+	
+	int gridsize = 81;
+	int lower_bound = floor(gridsize/2);
+	int upper_bound = lower_bound + 1;
 
-	double gauss_kernel[25];
+	double gauss_kernel[gridsize*gridsize];
 	int index;
 	int index2;
-	for (int i = -2; i < 3; ++i) {
-		for (int j = -2; j < 3; ++j) {
-			index = (i+2)*5 + (j+2);
+	for (int i = -lower_bound; i < upper_bound; ++i) {
+		for (int j = -lower_bound; j < upper_bound; ++j) {
+			index = (i+lower_bound)*gridsize + (j+lower_bound);
 			r = sqrt(i*i + j*j);
 			gauss_kernel[index] = exp(-(r*r)/s)/(M_PI * s);
 			sum_kernel += gauss_kernel[index];
 		}
 	}
 
-	for (int i = 0; i < 25; ++i) {
+	for (int i = 0; i < gridsize*gridsize; ++i) {
 		gauss_kernel[i] /= sum_kernel;
 	}
 
 	double *green_copy = 0;
 	green_copy = (double*)mkl_malloc(sim_data.get_N() * sizeof(double), 64);
+	for (int i = 0; i < sim_data.get_N(); ++i) {
+		green_copy[i] = 0;
+	}
+
 	double mysum = 0;
 
 	for (int iteration = 0; iteration < num_iterations; ++iteration) {
 
-		for (int i = 2; i < sim_data.get_num_x()-2; ++i) {
-			for (int j = 2; j < sim_data.get_num_y()-2; ++j) {
+		for (int i = lower_bound; i < sim_data.get_num_x()-lower_bound; ++i) {
+			for (int j = lower_bound; j < sim_data.get_num_y()-lower_bound; ++j) {
 				index2 = i*sim_data.get_num_x() + j;
-				for (int k = -2; k < 3; ++k) {
-					for (int l = -2; l < 3; ++l) {
-						index = (k+2)*5 + (l+2);
+				for (int k = -lower_bound; k < upper_bound; ++k) {
+					for (int l = -lower_bound; l < upper_bound; ++l) {
+						index = (k+lower_bound)*gridsize + (l+lower_bound);
 						green_copy[index2] += gauss_kernel[index] * this->green_potential[(i - k)*sim_data.get_num_x() + (j-l)];
 					}
 				}
