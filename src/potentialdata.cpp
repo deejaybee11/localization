@@ -195,7 +195,7 @@ void PotentialData::smooth_edges_green(SimulationData &sim_data, int num_iterati
 	double *green_copy = 0;
 	green_copy = (double*)mkl_malloc(sim_data.get_N() * sizeof(double), 64);
 	for (int i = 0; i < sim_data.get_N(); ++i) {
-		green_copy[i] = 0;
+		green_copy[i] = this->green_potential[i];
 	}
 
 	double mysum = 0;
