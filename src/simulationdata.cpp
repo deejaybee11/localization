@@ -84,7 +84,7 @@ SimulationData::SimulationData(int num_x, int num_y) {
 	this->dx = this->x[1] - this->x[0];
 	this->dy = this->y[1] - this->y[0];
 	//Tine steps
-	this->dt = this->dx * 0.001;
+	this->dt = this->dx * 0.0001;
 	this->num_imaginary_steps = 10000;
 	this->num_real_steps = 1000000;
 	//Populate momentum arrays
