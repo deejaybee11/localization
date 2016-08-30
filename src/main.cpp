@@ -52,6 +52,7 @@ int main() {
 	PotentialData pot_data(sim_data);
 	WaveFunction psi(sim_data, pot_data.harmonic_trap);
 	pot_data.calculate_green(sim_data);
+	pot_data.smooth_edges_green(sim_data, 500);
 
 	//Calculate the ground state
 	calculate_ground_state(sim_data, psi, pot_data);

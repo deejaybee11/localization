@@ -29,6 +29,7 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 #include <sys/stat.h>
+#include <iomanip>
 
 #include "mkl.h"
 
@@ -160,8 +161,58 @@ void PotentialData::calculate_non_linear(SimulationData &sim_data, WaveFunction 
 
 }
 
-void smooth_edges_green(SimulationData &sim_data) {
+void PotentialData::smooth_edges_green(SimulationData &sim_data, int num_iterations) {
+	double sigma = 1.0;
+	double r, s = 2.0 * sigma * sigma;
+	double sum_kernel = 0.0;
 
+	struct stat sb;
+	if (stat("SmoothedPotential.fit", &sb) == 0){
+		system("rm SmoothedPotential.fit");
+		std::cout << "SmoothedPotential.fit deleted" << std::endl;
+	}	
+
+	double gauss_kernel[25];
+	int index;
+	int index2;
+	for (int i = -2; i < 3; ++i) {
+		for (int j = -2; j < 3; ++j) {
+			index = (i+2)*5 + (j+2);
+			r = sqrt(i*i + j*j);
+			gauss_kernel[index] = exp(-(r*r)/s)/(M_PI * s);
+			sum_kernel += gauss_kernel[index];
+		}
+	}
+
+	for (int i = 0; i < 25; ++i) {
+		gauss_kernel[i] /= sum_kernel;
+	}
+
+	double *green_copy = 0;
+	green_copy = (double*)mkl_malloc(sim_data.get_N() * sizeof(double), 64);
+	double mysum = 0;
+
+	for (int iteration = 0; iteration < num_iterations; ++iteration) {
+
+		for (int i = 2; i < sim_data.get_num_x()-2; ++i) {
+			for (int j = 2; j < sim_data.get_num_y()-2; ++j) {
+				index2 = i*sim_data.get_num_x() + j;
+				for (int k = -2; k < 3; ++k) {
+					for (int l = -2; l < 3; ++l) {
+						index = (k+2)*5 + (l+2);
+						green_copy[index2] += gauss_kernel[index] * this->green_potential[(i - k)*sim_data.get_num_x() + (j-l)];
+					}
+				}
+			}
+		}
+	}
+
+
+	for (int i = 0; i < sim_data.get_N(); ++i) {
+		this->green_potential[i] = green_copy[i];
+	}
+
+	save_fits_image_potential(sim_data, this->green_potential, "SmoothedPotential.fit");	
 
 }
 

@@ -49,7 +49,7 @@ public:
 	void calculate_green(SimulationData &sim_data);
 	void assign_position_time_evolution(SimulationData &sim_data, WaveFunction &psi, bool harmonic_on, bool green_on, bool is_real);
 	void assign_momentum_time_evolution(SimulationData &sim_data, WaveFunction &psi, bool is_real);
-	void smooth_edges_green(SimulationData &sim_data);
+	void smooth_edges_green(SimulationData &sim_data, int num_iterations);
 };
 
 #endif    //    _POTENTIAL_DATA_H
