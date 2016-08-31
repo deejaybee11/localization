@@ -129,6 +129,8 @@ void PotentialData::assign_position_time_evolution(SimulationData &sim_data, Wav
 			this->pos_time_evolution[i].imag = 0;
 		}
 	}
+
+
 }
 
 void PotentialData::assign_momentum_time_evolution(SimulationData &sim_data, WaveFunction &psi, bool is_real){
@@ -162,7 +164,7 @@ void PotentialData::calculate_non_linear(SimulationData &sim_data, WaveFunction 
 }
 
 void PotentialData::smooth_edges_green(SimulationData &sim_data, int num_iterations) {
-	double sigma = 15.0;
+	double sigma = 7.0;
 	double r, s = 2.0 * sigma * sigma;
 	double sum_kernel = 0.0;
 
@@ -172,7 +174,7 @@ void PotentialData::smooth_edges_green(SimulationData &sim_data, int num_iterati
 		std::cout << "SmoothedPotential.fit deleted" << std::endl;
 	}	
 	
-	int gridsize = 81;
+	int gridsize = 21;
 	int lower_bound = floor(gridsize/2);
 	int upper_bound = lower_bound + 1;
 
@@ -199,16 +201,36 @@ void PotentialData::smooth_edges_green(SimulationData &sim_data, int num_iterati
 	}
 
 	double mysum = 0;
-
+	int x1, y1;
 	for (int iteration = 0; iteration < num_iterations; ++iteration) {
 
-		for (int i = lower_bound; i < sim_data.get_num_x()-lower_bound; ++i) {
-			for (int j = lower_bound; j < sim_data.get_num_y()-lower_bound; ++j) {
+		for (int i = 0; i < sim_data.get_num_x(); ++i) {
+			for (int j = 0; j < sim_data.get_num_y(); ++j) {
 				index2 = i*sim_data.get_num_x() + j;
 				for (int k = -lower_bound; k < upper_bound; ++k) {
 					for (int l = -lower_bound; l < upper_bound; ++l) {
 						index = (k+lower_bound)*gridsize + (l+lower_bound);
-						green_copy[index2] += gauss_kernel[index] * this->green_potential[(i - k)*sim_data.get_num_x() + (j-l)];
+						if ((i - k) < 0) {
+							x1 = (i - k) + sim_data.get_num_x();
+						}
+						else if ((i-k) >= sim_data.get_num_x()){
+							x1 = (i-k) - sim_data.get_num_x();
+						}
+						else {
+							x1 = (i-k);
+						}
+						if ((j - l) < 0) {
+							y1 = (j - l) + sim_data.get_num_y();
+						}
+						else if ((j-l) >= sim_data.get_num_y()){
+							y1 = (j-l) - sim_data.get_num_y();
+						}
+						else {
+							y1 = (j-l);
+						}
+
+						green_copy[index2] += gauss_kernel[index] * this->green_potential[x1*sim_data.get_num_y() + y1];
+//						green_copy[index2] += gauss_kernel[index] * this->green_potential[(i - k)*sim_data.get_num_y() + (j-l)];
 					}
 				}
 			}

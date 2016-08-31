@@ -64,7 +64,7 @@ SimulationData::SimulationData(int num_x, int num_y) {
 	//Green parameters
 	this->fill_factor = 0.2;
 	this->scatter_height = 1;
-	this->dumbell_radius = 10.0;
+	this->dumbell_radius = 15.0;
 	this->channel_width = 10;
 	this->channel_length = 25;
 	this->x_offset = 0;

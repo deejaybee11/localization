@@ -58,7 +58,7 @@ void calculate_ground_state(SimulationData &sim_data, WaveFunction &psi, Potenti
 	pot_data.assign_momentum_time_evolution(sim_data, psi, false);
 	//Time to find the ground state!
 	for (int i = 0; i < sim_data.num_imaginary_steps; ++i) {
-		if (i%100 == 0) {
+		if (i%1000 == 0) {
 			std::cout << "Imaginary step " << i << " of " << sim_data.num_imaginary_steps << std::endl;
 		}
 		
