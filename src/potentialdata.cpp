@@ -270,8 +270,8 @@ void PotentialData::smooth_edges_green(SimulationData &sim_data, int num_iterati
 						this->green_potential[index] = 5000;
 						this->green_potential[index+1] = 2500;
 						this->green_potential[index-1] = 2500;
-//						this->green_potential[index+sim_data.get_num_y()-1] = 2500;
-//						this->green_potential[index-sim_data.get_num_y()-1] = 2500;
+						this->green_potential[index+sim_data.get_num_y()] = 2500;
+						this->green_potential[index-sim_data.get_num_y()] = 2500;
 						num_pixels_left -= 1;
 					}
 				}
