@@ -52,8 +52,8 @@ SimulationData::SimulationData(int num_x, int num_y) {
 	this->num_y = num_y;
 	this->N = num_x*num_y;
 	//Length scales
-	this->length_x = 120;
-	this->length_y = 120;
+	this->length_x = 150;
+	this->length_y = 150;
 	//BEC parameters
 	this->sigma_x = 1;
 	this->sigma_y = 1.2;
@@ -62,8 +62,8 @@ SimulationData::SimulationData(int num_x, int num_y) {
 	this->gamma_x = 1;
 	this->gamma_y = 1.2;
 	//Green parameters
-	this->fill_factor = 0.2;
-	this->scatter_height = 1;
+	this->fill_factor = 0.1;
+	this->scatter_height = 5000;
 	this->dumbell_radius = 15.0;
 	this->channel_width = 10;
 	this->channel_length = 25;
@@ -86,7 +86,7 @@ SimulationData::SimulationData(int num_x, int num_y) {
 	//Tine steps
 	this->dt = this->dx * 0.0001;
 	this->num_imaginary_steps = 10000;
-	this->num_real_steps = 1000000;
+	this->num_real_steps = 100000000;
 	//Populate momentum arrays
 	double ax = -0.5 * this->num_x;
 	double bx = 0.5 * this->num_x - 1.0;

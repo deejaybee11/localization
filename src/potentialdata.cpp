@@ -30,12 +30,14 @@
 #include <math.h>
 #include <sys/stat.h>
 #include <iomanip>
+#include <random>
 
 #include "mkl.h"
 
 #include "../include/simulationdata.hpp"
 #include "../include/wavefunction.hpp"
 #include "../include/savedata.hpp"
+
 
 PotentialData::PotentialData(SimulationData &sim_data) {
 
@@ -102,6 +104,7 @@ void PotentialData::calculate_green(SimulationData &sim_data) {
 			}
 		}
 	}
+
 	save_fits_image_potential(sim_data, this->green_potential, "GreenPotential.fit");	
 }
 
@@ -174,11 +177,14 @@ void PotentialData::smooth_edges_green(SimulationData &sim_data, int num_iterati
 		std::cout << "SmoothedPotential.fit deleted" << std::endl;
 	}	
 	
-	int gridsize = 21;
+	int gridsize = 11;
 	int lower_bound = floor(gridsize/2);
 	int upper_bound = lower_bound + 1;
 
 	double gauss_kernel[gridsize*gridsize];
+	double cosine_kernel[gridsize*gridsize];
+	double omega = 0;
+	double t = 0;
 	int index;
 	int index2;
 	for (int i = -lower_bound; i < upper_bound; ++i) {
@@ -186,6 +192,7 @@ void PotentialData::smooth_edges_green(SimulationData &sim_data, int num_iterati
 			index = (i+lower_bound)*gridsize + (j+lower_bound);
 			r = sqrt(i*i + j*j);
 			gauss_kernel[index] = exp(-(r*r)/s)/(M_PI * s);
+			cosine_kernel[index] = cos(omega * t);
 			sum_kernel += gauss_kernel[index];
 		}
 	}
@@ -240,6 +247,36 @@ void PotentialData::smooth_edges_green(SimulationData &sim_data, int num_iterati
 
 	for (int i = 0; i < sim_data.get_N(); ++i) {
 		this->green_potential[i] = green_copy[i];
+	}
+
+	int num_pixels_in_channel = floor(sim_data.channel_width*sim_data.channel_length*sim_data.fill_factor);
+	int num_pixels_left = floor(sim_data.channel_width*sim_data.channel_length*sim_data.fill_factor);
+
+	int xvalue = 0;
+	int yvalue = 0;
+	index = 0;
+
+	std::random_device rnd;
+	std::mt19937 mt(rnd());
+	std::uniform_real_distribution<double> dist(0.0,1.0);
+
+	while (num_pixels_left > 0) {
+		
+		for (int i = 0; i < sim_data.get_num_x(); ++i) {
+			for (int j = 0; j < sim_data.get_num_y(); ++j) {
+				index = i * sim_data.get_num_y() + j;
+				if ((fabs(sim_data.x[i] - sim_data.x_offset) <= sim_data.channel_width/2.0) && ((sim_data.y[j] - sim_data.y_offset - sim_data.dumbell_radius) >= 0) && ((sim_data.y[j] - sim_data.y_offset) <= (sim_data.dumbell_radius + sim_data.channel_length))) {// && ((sim_data.y[i] - sim_data.y_offset) >= sim_data.dumbell_radius))  {
+					if (dist(mt) < sim_data.fill_factor) {
+						this->green_potential[index] = 5000;
+						this->green_potential[index+1] = 2500;
+						this->green_potential[index-1] = 2500;
+//						this->green_potential[index+sim_data.get_num_y()-1] = 2500;
+//						this->green_potential[index-sim_data.get_num_y()-1] = 2500;
+						num_pixels_left -= 1;
+					}
+				}
+			}
+		}
 	}
 
 	save_fits_image_potential(sim_data, this->green_potential, "SmoothedPotential.fit");	
