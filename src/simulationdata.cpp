@@ -62,11 +62,12 @@ SimulationData::SimulationData(int num_x, int num_y) {
 	this->gamma_x = 1;
 	this->gamma_y = 1.2;
 	//Green parameters
-	this->fill_factor = 0.1;
+	this->fill_factor = 0.005;
 	this->scatter_height = 5000;
 	this->dumbell_radius = 15.0;
 	this->channel_width = 10;
 	this->channel_length = 25;
+	this->num_pixels_in_channel_total = 0;
 	this->x_offset = 0;
 	this->y_offset = 0;
 	//Array memory
@@ -85,8 +86,8 @@ SimulationData::SimulationData(int num_x, int num_y) {
 	this->dy = this->y[1] - this->y[0];
 	//Tine steps
 	this->dt = this->dx * 0.0001;
-	this->num_imaginary_steps = 10000;
-	this->num_real_steps = 100000000;
+	this->num_imaginary_steps = 100000;
+	this->num_real_steps = 1000000000;
 	//Populate momentum arrays
 	double ax = -0.5 * this->num_x;
 	double bx = 0.5 * this->num_x - 1.0;

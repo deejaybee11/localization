@@ -99,6 +99,10 @@ void PotentialData::calculate_green(SimulationData &sim_data) {
 			if (radius_squared2 <= dumbell_radius_squared) {
 				this->green_potential[index] = 0;
 			}
+			if ((fabs(sim_data.x[i] - sim_data.x_offset) <= sim_data.channel_width/2.0) && ((sim_data.y[j] - sim_data.y_offset - sim_data.dumbell_radius) >= 0) && ((sim_data.y[j] - sim_data.y_offset) <= (sim_data.dumbell_radius + sim_data.channel_length))) {
+				sim_data.num_pixels_in_channel_total += 1;
+			}
+
 			if ((fabs(sim_data.x[i] - sim_data.x_offset) <= sim_data.channel_width/2.0) && ((sim_data.y[j] - sim_data.y_offset) >= 0) && ((sim_data.y[j] - sim_data.y_offset) <= (2*sim_data.dumbell_radius + sim_data.channel_length))) {
 				this->green_potential[index] = 0;
 			}
@@ -249,18 +253,20 @@ void PotentialData::smooth_edges_green(SimulationData &sim_data, int num_iterati
 		this->green_potential[i] = green_copy[i];
 	}
 
-	int num_pixels_in_channel = floor(sim_data.channel_width*sim_data.channel_length*sim_data.fill_factor);
-	int num_pixels_left = floor(sim_data.channel_width*sim_data.channel_length*sim_data.fill_factor);
+	
+	std::random_device rnd;
+	std::mt19937 mt(rnd());
+	std::uniform_real_distribution<double> dist(0.0,1.0);
+
+	int num_pixels_in_channel = floor(sim_data.num_pixels_in_channel_total * sim_data.fill_factor);
+	std::cout << num_pixels_in_channel << std::endl;
+	int num_pixels_left = floor(sim_data.num_pixels_in_channel_total * sim_data.fill_factor);
 
 	int xvalue = 0;
 	int yvalue = 0;
 	index = 0;
 
-	std::random_device rnd;
-	std::mt19937 mt(rnd());
-	std::uniform_real_distribution<double> dist(0.0,1.0);
-
-	while (num_pixels_left > 0) {
+	while (num_pixels_left >= 1) {
 		
 		for (int i = 0; i < sim_data.get_num_x(); ++i) {
 			for (int j = 0; j < sim_data.get_num_y(); ++j) {
@@ -273,12 +279,19 @@ void PotentialData::smooth_edges_green(SimulationData &sim_data, int num_iterati
 						this->green_potential[index+sim_data.get_num_y()] = 2500;
 						this->green_potential[index-sim_data.get_num_y()] = 2500;
 						num_pixels_left -= 1;
+						std::cout << num_pixels_left << std::endl;
+						if (num_pixels_left == 0) {
+							goto BREAKLOOP;
+						}
 					}
 				}
 			}
 		}
 	}
 
+	BREAKLOOP:
+		printf("While broken\n");
+	
 	save_fits_image_potential(sim_data, this->green_potential, "SmoothedPotential.fit");	
 
 }

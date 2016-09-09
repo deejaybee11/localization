@@ -73,6 +73,7 @@ public:
 	double dumbell_radius;
 	double channel_width;
 	double channel_length;
+	int num_pixels_in_channel_total;
 	double x_offset;
 	double y_offset;
 	//Iteration stuff

@@ -103,7 +103,7 @@ void calculate_time_evolution(SimulationData &sim_data, WaveFunction &psi, Poten
 	for (int i = 0; i < sim_data.num_real_steps; ++i) {
 		//calculate abs(psi)**2
 		psi.calc_abs_psi(sim_data.get_N());
-		if (i%10000 == 0) {
+		if (i%1000000 == 0) {
 			sim_data.current_step = i;
 			std::cout << "Real step " << i << " of " << sim_data.num_real_steps << std::endl;
 			char buf1[200];

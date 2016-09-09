@@ -48,7 +48,7 @@ int main() {
 //	mkl_disable_fast_mm();
 
 	//Initiate classes
-	SimulationData sim_data(512, 512);
+	SimulationData sim_data(2048, 2048);
 	PotentialData pot_data(sim_data);
 	WaveFunction psi(sim_data, pot_data.harmonic_trap);
 	pot_data.calculate_green(sim_data);
