@@ -29,6 +29,9 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 
+#include "../inih/ini.h"
+#include "../inih/INIReader.h"
+
 
 //Class Constructor
 
@@ -47,29 +50,37 @@ SimulationData::SimulationData(int num_x, int num_y) {
 	printf("Directory Created\n");
 	sprintf(this->folder, "fits/%.4d%.2d%.2d%.2d%.2d", 1900 + this->mytime->tm_year, 1 + this->mytime->tm_mon, this->mytime->tm_mday, this->mytime->tm_hour, this->mytime->tm_min);
 	sprintf(this->date, "%.4d%.2d%.2d%.2d%.2d", 1900 + this->mytime->tm_year, 1 + this->mytime->tm_mon, this->mytime->tm_mday, this->mytime->tm_hour, this->mytime->tm_min);
+
+	//Loads INI file
+	INIReader reader("conf.ini");
+	if (reader.ParseError() <0) {
+		std::cout << "Error loading config file 'conf.ini', using default parameters." << std::endl;
+	}
+
 	//Simulation Data
 	this->num_x = num_x;
 	this->num_y = num_y;
 	this->N = num_x*num_y;
 	//Length scales
-	this->length_x = 150;
-	this->length_y = 150;
+	this->length_x = reader.GetInteger("config", "length_x", 150);
+	std::cout << "The ini file has length_x = " << reader.GetInteger("config", "length_x", 150) << " but the value in memory is = " << this->length_x  << std::endl;
+	this->length_y = reader.GetInteger("config", "length_y", 150);
 	//BEC parameters
-	this->sigma_x = 1;
-	this->sigma_y = 1.2;
-	this->beta = 1;
+	this->sigma_x = reader.GetReal("config", "sigma_x", 1);
+	this->sigma_y = reader.GetReal("config", "sigma_y", 1.2);
+	this->beta = reader.GetReal("config", "beta", 1);
 	//Harmonic Trap
-	this->gamma_x = 1;
-	this->gamma_y = 1.2;
+	this->gamma_x = reader.GetReal("config", "gamma_x", 1);
+	this->gamma_y = reader.GetReal("config", "gamma_y", 1.2);
 	//Green parameters
-	this->fill_factor = 0.005;
-	this->scatter_height = 5000;
-	this->dumbell_radius = 15.0;
-	this->channel_width = 10;
-	this->channel_length = 25;
+	this->fill_factor = reader.GetReal("config", "fill_factor", 0.001);
+	this->scatter_height = reader.GetReal("config", "scatter_height", 5000);
+	this->dumbell_radius = reader.GetReal("config", "dumbell_radius", 15);
+	this->channel_width = reader.GetReal("config", "channel_width", 10);
+	this->channel_length = reader.GetReal("config", "channel_length", 25);
 	this->num_pixels_in_channel_total = 0;
-	this->x_offset = 0;
-	this->y_offset = 0;
+	this->x_offset = reader.GetReal("config", "x_offset", 0);
+	this->y_offset = reader.GetReal("config", "y_offset", 0);
 	//Array memory
 	this->x = (double*)mkl_malloc(this->num_x * sizeof(double), 64);
 	this->y = (double*)mkl_malloc(this->num_y * sizeof(double), 64);
@@ -85,9 +96,9 @@ SimulationData::SimulationData(int num_x, int num_y) {
 	this->dx = this->x[1] - this->x[0];
 	this->dy = this->y[1] - this->y[0];
 	//Tine steps
-	this->dt = this->dx * 0.0001;
-	this->num_imaginary_steps = 100000;
-	this->num_real_steps = 1000000000;
+	this->dt = this->dx * 0.001;
+	this->num_imaginary_steps = reader.GetInteger("config", "num_imaginary_steps", 100000);
+	this->num_real_steps = reader.GetInteger("config", "num_real_steps", 100000000);
 	//Populate momentum arrays
 	double ax = -0.5 * this->num_x;
 	double bx = 0.5 * this->num_x - 1.0;

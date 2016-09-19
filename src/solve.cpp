@@ -103,13 +103,13 @@ void calculate_time_evolution(SimulationData &sim_data, WaveFunction &psi, Poten
 	for (int i = 0; i < sim_data.num_real_steps; ++i) {
 		//calculate abs(psi)**2
 		psi.calc_abs_psi(sim_data.get_N());
-		if (i%1000000 == 0) {
+		if (i%100000 == 0) {
 			sim_data.current_step = i;
 			std::cout << "Real step " << i << " of " << sim_data.num_real_steps << std::endl;
 			char buf1[200];
 			char buf2[200];
 			strcpy(buf1, sim_data.folder);
-			sprintf(buf2, "/psi%d.fit\0", i/10000);
+			sprintf(buf2, "/psi%d.fit\0", i/100000);
 			strcat(buf1, buf2);
 			int length = strlen(buf1);
 			char *full_filename;

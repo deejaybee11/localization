@@ -64,7 +64,6 @@ PotentialData::PotentialData(SimulationData &sim_data) {
 			this->kinetic_energy[index] = k_en_val;
 		}
 	}
-	std::cout << this->harmonic_trap[120] << std::endl;
 };
 
 void PotentialData::calculate_green(SimulationData &sim_data) {
@@ -259,7 +258,6 @@ void PotentialData::smooth_edges_green(SimulationData &sim_data, int num_iterati
 	std::uniform_real_distribution<double> dist(0.0,1.0);
 
 	int num_pixels_in_channel = floor(sim_data.num_pixels_in_channel_total * sim_data.fill_factor);
-	std::cout << num_pixels_in_channel << std::endl;
 	int num_pixels_left = floor(sim_data.num_pixels_in_channel_total * sim_data.fill_factor);
 
 	int xvalue = 0;
@@ -279,7 +277,6 @@ void PotentialData::smooth_edges_green(SimulationData &sim_data, int num_iterati
 						this->green_potential[index+sim_data.get_num_y()] = 2500;
 						this->green_potential[index-sim_data.get_num_y()] = 2500;
 						num_pixels_left -= 1;
-						std::cout << num_pixels_left << std::endl;
 						if (num_pixels_left == 0) {
 							goto BREAKLOOP;
 						}
